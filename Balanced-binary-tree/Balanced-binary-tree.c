@@ -54,12 +54,12 @@ Tree *imbalanced_node(Tree *node);
 
 /* 判断失衡类型，有四种，返回
  * 0-3，分别对应LL，LR，RR，RL
- * 传入的node必须是叶节点*/
-int imbalance_type(Tree *node);
+ * 传入的node必须是不平衡节点*/
+int imbalance_type(Tree *imb_node);
 
 /* 旋转树，使树平衡，传入不平
- * 衡节点 */
-void rotate(Tree *node);
+ * 衡节点和不平衡类型 */
+void rotate(Tree *node, int type);
 
 /* 传入一个叶节点，更新所有节
  * 点的高度值 */
@@ -142,9 +142,13 @@ add(int data)
 	}
 	new_node->parent = parent;
 	update_height(new_node);
-	
-	imbalanced_node(new_node);
 
+	Tree *imbalanced_tree = imbalanced_node(new_node);
+	if (imblanced_tree == NULL)
+		return ;
+	int type = imbalance_type(imbalanced_tree);
+
+	rotate(imbalanced_tree, type);
 }
 
 int tree_delete(int data)
@@ -154,19 +158,61 @@ int tree_delete(int data)
 Tree *
 imbalanced_node(Tree *node)
 {
-	
-	
+	while(node->parent != NULL)
+	{
+		node = node->parent;
+
+		int right_height = -1;
+		int left_height = -1;
+
+		if (node->right != NULL)
+			right_height = node->right->height;
+
+		if (node->left != NULL)
+			left_height = node->left->height;
+
+		if (abs(left_height - right_height) >= 2)
+			return node;
+
+	}
+	return NULL;
 }
 
 int 
 imbalance_type(Tree *node)
 {
+	Tree *child = NULL;
+	int L1, L2, R1, R2;
+	node->left == NULL ? L1 = -1 : L1 = node->left->height;
+	node->right == NULL ? R1 = -1 : R1 = node->right->height;
+	L1 > R1 ? child = node->left : child = node->right;
+
+	child->left == NULL ? L2 = -1 : L2 = child->left->height;
+	child->right == NULL ? R2 = -1 : R2 = child->right->height;
+
+	if (L1 > R1 && L2 > R2)
+		return 0;
+	else if (L1 > R1 && L2 < R2)
+		return 1;
+	else if (L1 < R1 && L2 > R2)
+		return 2;
+	else if (L1 < R1 && L2 < R2)
+		return 4;
 }
 
 void
-rotate(Tree *node)
+rotate(Tree *node, int type)
 {
 
+	if (type == 0) {
+
+	} else if (type == 1) {
+
+	} else if (type == 2) {
+
+	} else if (type == 3) {
+
+	}
 }
 
 void 
