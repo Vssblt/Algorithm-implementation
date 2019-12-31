@@ -87,6 +87,7 @@ main()
 	scanf("%d", &del_num);
 	if (del_num > n) {
 		printf("Not so many nodes");
+		return 0;
 	}
 	for (int i = 0; i < del_num; i++) {
 		int data = 0;
@@ -171,13 +172,19 @@ add(int data)
 
 int tree_delete(int data)
 {
-	/*
 	Tree *node = search(data);
+	Tree *balance_check_node = NULL;
 	if (node == NULL) {
 		return -1;
 	}
 	Tree *parent = node->parent;
-	if (node->left == node->right && node->left == NULL) {
+
+	if (node->left != NULL && node->right != NULL) { //如果删除的节点有左右孩子，则进行中序遍历
+		
+	}
+
+	if (node->left == node->right) { 
+		//叶节点，直接删除
 		if (parent == NULL) {
 			free(node);
 			return 0;
@@ -189,18 +196,46 @@ int tree_delete(int data)
 		}
 		free(node);
 		update_height(parent);
-		return 0;
+		balance_check_node = parent;
+	} else if (node->left != node->right) { 
+		//被删除的节点有一个子节点，则将子节点代替删除节点
+		Tree *child = NULL;
+		Tree *parent = node->parent;
+
+		if (node->left != NULL)
+			child = node->left;
+		else
+			child = node->right;
+
+		if (node == parent->left)
+			parent->left = child;
+		else
+			parent->right = child;
+
+		child->parent = parent;
+
+		update_height(child);
+		free(node);
+		balance_check_node = parent;
 	}
-	*/
-	reutrn 0;
+
+	/*balance check*/
+	while(balance_check_node != NULL) {
+		Tree *imbalanced = imbalanced_node(balance_check_node);
+		balance_check_node = imbalanced;
+		if (imbalanced == NULL)
+			return 0;
+		int type = imbalance_type(imbalanced);
+		rotate(imbalanced, type);
+	}
+	return 0;
 }
 
 Tree *
 imbalanced_node(Tree *node)
 {
-	while(node->parent != NULL)
+	while(node != NULL)
 	{
-		node = node->parent;
 		int right_height = -1;
 		int left_height = -1;
 
@@ -212,6 +247,7 @@ imbalanced_node(Tree *node)
 
 		if (abs(left_height - right_height) >= 2)
 			return node;
+		node = node->parent;
 
 	}
 	return NULL;
