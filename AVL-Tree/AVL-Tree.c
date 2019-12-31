@@ -48,9 +48,7 @@ int tree_delete(int data);
 
 /* 向父节点查找不平衡节点，直
  * 到到达祖父节点，找到则返回
- * 该节点的地址，否则返回NULL。
- * 注意：本函数只允许传入新加
- * 入到树中的叶节点*/
+ * 该节点的地址，否则返回NULL。*/
 Tree *imbalanced_node(Tree *node);
 
 /* 判断失衡类型，有四种，返回
@@ -70,7 +68,7 @@ void update_height(Tree *node);
 int
 main()
 {
-	int n = 0;
+	int n = 0, is_del = 0, del_num = 0;
 	printf("Please input size of tree: ");
 	scanf("%d", &n);
 	for (int i = 0; i < n; i++) {
@@ -78,6 +76,24 @@ main()
 		scanf("%d", &data);
 		add(data);
 	}
+	getchar();
+
+	printf("Do you want delete nodes? (y/n)");
+	is_del = getchar();
+	if (0x59 != is_del && 0x79 != is_del) {
+		return 0;
+	}
+	printf("How many nodes do you want to delete?");
+	scanf("%d", &del_num);
+	if (del_num > n) {
+		printf("Not so many nodes");
+	}
+	for (int i = 0; i < del_num; i++) {
+		int data = 0;
+		scanf("%d", &data);
+		tree_delete(data);
+	}
+
 	return 0;
 }
 
@@ -155,6 +171,28 @@ add(int data)
 
 int tree_delete(int data)
 {
+	/*
+	Tree *node = search(data);
+	if (node == NULL) {
+		return -1;
+	}
+	Tree *parent = node->parent;
+	if (node->left == node->right && node->left == NULL) {
+		if (parent == NULL) {
+			free(node);
+			return 0;
+		}
+		if (parent->left == node) {
+			parent->left = NULL;
+		} else {
+			parent->right = NULL;
+		}
+		free(node);
+		update_height(parent);
+		return 0;
+	}
+	*/
+	reutrn 0;
 }
 
 Tree *
@@ -163,7 +201,6 @@ imbalanced_node(Tree *node)
 	while(node->parent != NULL)
 	{
 		node = node->parent;
-
 		int right_height = -1;
 		int left_height = -1;
 
