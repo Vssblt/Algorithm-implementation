@@ -61,8 +61,9 @@ int imbalance_type(Tree *imb_node);
 /* 旋转树，使树平衡，传入不平
  * 衡节点和不平衡类型 */
 void rotate(Tree *node, int type);
+void rotate34(Tree *a, Tree *b, Tree *c, Tree *t0, Tree *t1, Tree *t2, Tree *t3);
 
-/* 传入一个叶节点，更新所有节
+/* 传入一个节点，更新所有节
  * 点的高度值 */
 void update_height(Tree *node);
 
@@ -149,7 +150,7 @@ add(int data)
 		return ;
 	int type = imbalance_type(imbalanced_tree);
 
-	//rotate(imbalanced_tree, type);
+	rotate(imbalanced_tree, type);
 }
 
 int tree_delete(int data)
@@ -205,21 +206,94 @@ void
 rotate(Tree *node, int type)
 {
 	if (type == 0) {
-		
+		Tree *leaf = node->left->left;
+		Tree *parent = node->left;
+		Tree *grandpa = node;
+		parent->parent = grandpa->parent;
+		if (grandpa->parent != NULL) {
+			if (grandpa->parent->left == grandpa) {
+				grandpa->parent->left = parent;
+			} else {
+				grandpa->parent->right = parent;
+			}
+		} else {
+			root = parent;
+		}
+		rotate34(leaf, parent, grandpa, leaf->left, leaf->right, parent->right, grandpa->right);
 	} else if (type == 1) {
-
+		Tree *leaf = node->left->right;
+		Tree *parent = node->left;
+		Tree *grandpa = node;
+		leaf->parent = grandpa->parent;
+		if (grandpa->parent != NULL) {
+			if (grandpa->parent->left == grandpa) {
+				grandpa->parent->left = leaf;
+			} else {
+				grandpa->parent->right = leaf;
+			}
+		} else {
+			root = leaf;
+		}
+		rotate34(parent, leaf, grandpa, parent->left, leaf->left, leaf->right, grandpa->right);
 	} else if (type == 2) {
-
+		Tree *leaf = node->right->left;
+		Tree *parent = node->right;
+		Tree *grandpa = node;
+		leaf->parent = grandpa->parent;
+		if (grandpa->parent != NULL) {
+			if (grandpa->parent->left == grandpa) {
+				grandpa->parent->left = leaf;
+			} else {
+				grandpa->parent->right = leaf;
+			}
+		} else {
+			root = leaf;
+		}
+		rotate34(grandpa, leaf, parent, grandpa->left, leaf->left, leaf->right, parent->right);
 	} else if (type == 3) {
-
+		Tree *leaf = node->right->right;
+		Tree *parent = node->right;
+		Tree *grandpa = node;
+		parent->parent = grandpa->parent;
+		if (grandpa->parent != NULL) {
+			if (grandpa->parent->left == grandpa) {
+				grandpa->parent->left = parent;
+			} else {
+				grandpa->parent->right = parent;
+			}
+		} else {
+			root = parent;
+		}
+		rotate34(grandpa, parent, leaf, grandpa->left, parent->left, leaf->left, leaf->right);
 	}
+}
+
+void 
+rotate34(Tree *a, Tree *b, Tree *c, Tree *t0, Tree *t1, Tree *t2, Tree *t3)
+{
+	b->left = a;
+	b->right = c;
+	a->parent = b;
+	a->left = t0;
+	if (t0 != NULL) t0->parent = a;
+	a->right = t1;
+	if (t1 != NULL) t1->parent = a;
+	c->parent = b;
+	c->left = t2;
+	if (t2 != NULL) t2->parent = c;
+	c->right = t3;
+	if (t3 != NULL) t3->parent = c;
+	
+	update_height(a);
+	update_height(c);
+
+	update_height(b);
 }
 
 void 
 update_height(Tree *node)
 {
 	while(node->parent != NULL) {
-		node = node->parent;
 		int left_height = -1;
 		int right_height = -1;
 		if (node->left == NULL)
@@ -231,6 +305,7 @@ update_height(Tree *node)
 		else 
 			right_height = node->right->height;
 		node->height = max(left_height, right_height) + 1;
+		node = node->parent;
 	}
 }
 /*

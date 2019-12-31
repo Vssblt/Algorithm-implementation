@@ -1,2 +1,2 @@
 all:
-	gcc Balanced-binary-tree.c -o Balanced-binary-tree.exe -g -std=gnu99
+	gcc AVL-Tree.c -o AVL-Tree.exe -g -std=gnu99
