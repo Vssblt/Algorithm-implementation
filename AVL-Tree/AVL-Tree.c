@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <malloc.h>
+#include <stdlib.h>
 
 #ifdef __GNUC__
 #define max(x, y) ({ \
@@ -144,11 +145,11 @@ add(int data)
 	update_height(new_node);
 
 	Tree *imbalanced_tree = imbalanced_node(new_node);
-	if (imblanced_tree == NULL)
+	if (imbalanced_tree == NULL)
 		return ;
 	int type = imbalance_type(imbalanced_tree);
 
-	rotate(imbalanced_tree, type);
+	//rotate(imbalanced_tree, type);
 }
 
 int tree_delete(int data)
@@ -183,12 +184,12 @@ imbalance_type(Tree *node)
 {
 	Tree *child = NULL;
 	int L1, L2, R1, R2;
-	node->left == NULL ? L1 = -1 : L1 = node->left->height;
-	node->right == NULL ? R1 = -1 : R1 = node->right->height;
-	L1 > R1 ? child = node->left : child = node->right;
+	L1 = (node->left == NULL ? -1 : node->left->height);
+	R1 = (node->right == NULL ? -1 : node->right->height);
+	child = (L1 > R1 ? node->left : node->right);
 
-	child->left == NULL ? L2 = -1 : L2 = child->left->height;
-	child->right == NULL ? R2 = -1 : R2 = child->right->height;
+	L2 = (child->left == NULL ? -1 : child->left->height);
+	R2 = (child->right == NULL ? -1 : child->right->height);
 
 	if (L1 > R1 && L2 > R2)
 		return 0;
@@ -197,15 +198,14 @@ imbalance_type(Tree *node)
 	else if (L1 < R1 && L2 > R2)
 		return 2;
 	else if (L1 < R1 && L2 < R2)
-		return 4;
+		return 3;
 }
 
 void
 rotate(Tree *node, int type)
 {
-
 	if (type == 0) {
-
+		
 	} else if (type == 1) {
 
 	} else if (type == 2) {
