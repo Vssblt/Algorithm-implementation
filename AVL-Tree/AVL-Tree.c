@@ -179,12 +179,23 @@ int tree_delete(int data)
 	}
 	Tree *parent = node->parent;
 
-	if (node->left != NULL && node->right != NULL) { //如果删除的节点有左右孩子，则进行中序遍历
-		
+	//如果删除的节点有左右孩子，则进行中序遍历
+	if (node->left != NULL && node->right != NULL) { 
+		Tree *pointer = root;
+		ptr_parent = root->parent;
+		while(pointer) {
+			ptr_parent = pointer;
+			pointer = pointer->left;
+		}
+		pointer = ptr_parent;
+		while (pointer) {
+			pointer = NULL;
+
+		}
 	}
 
+	//叶节点，直接删除
 	if (node->left == node->right) { 
-		//叶节点，直接删除
 		if (parent == NULL) {
 			free(node);
 			return 0;
@@ -219,7 +230,7 @@ int tree_delete(int data)
 		balance_check_node = parent;
 	}
 
-	/*balance check*/
+	/*向上检查平衡性*/
 	while(balance_check_node != NULL) {
 		Tree *imbalanced = imbalanced_node(balance_check_node);
 		balance_check_node = imbalanced;
