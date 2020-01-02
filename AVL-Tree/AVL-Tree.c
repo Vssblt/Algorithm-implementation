@@ -182,7 +182,7 @@ int tree_delete(int data)
 	//如果删除的节点有左右孩子，则进行中序遍历
 	if (node->left != NULL && node->right != NULL) { 
 		Tree *pointer = root;
-		ptr_parent = root->parent;
+		Tree *ptr_parent = root->parent;
 		while(pointer) {
 			ptr_parent = pointer;
 			pointer = pointer->left;
@@ -197,6 +197,7 @@ int tree_delete(int data)
 	//叶节点，直接删除
 	if (node->left == node->right) { 
 		if (parent == NULL) {
+			root = NULL;
 			free(node);
 			return 0;
 		}
@@ -218,10 +219,14 @@ int tree_delete(int data)
 		else
 			child = node->right;
 
-		if (node == parent->left)
-			parent->left = child;
-		else
-			parent->right = child;
+		if (parent != NULL) {
+			if (node == parent->left)
+				parent->left = child;
+			else
+				parent->right = child;
+		} else {
+			root = child;
+		}
 
 		child->parent = parent;
 
