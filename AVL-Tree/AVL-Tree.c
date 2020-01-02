@@ -65,6 +65,8 @@ void rotate34(Tree *a, Tree *b, Tree *c, Tree *t0, Tree *t1, Tree *t2, Tree *t3)
  * 点的高度值 */
 void update_height(Tree *node);
 
+void LOG(Tree *root);
+
 int
 main()
 {
@@ -81,19 +83,21 @@ main()
 	printf("Do you want delete nodes? (y/n)");
 	is_del = getchar();
 	if (0x59 != is_del && 0x79 != is_del) {
-		return 0;
+		goto RETURN;
 	}
 	printf("How many nodes do you want to delete?");
 	scanf("%d", &del_num);
 	if (del_num > n) {
 		printf("Not so many nodes");
-		return 0;
+		goto RETURN;
 	}
 	for (int i = 0; i < del_num; i++) {
 		int data = 0;
 		scanf("%d", &data);
 		tree_delete(data);
 	}
+
+RETURN:	LOG(root);
 
 	return 0;
 }
@@ -392,15 +396,13 @@ update_height(Tree *node)
 		node = node->parent;
 	}
 }
-/*
+
 void 
-LOG()
+LOG(Tree *ptr_root)
 {
-	Tree *pointer = root;
-	while (pointer != NULL) {
-
-
-
+	if (ptr_root != NULL) {
+		LOG(ptr_root->left);
+		printf("%d   ", ptr_root->data);
+		LOG(ptr_root->right);
 	}
 }
-*/
