@@ -76,6 +76,9 @@ where_insert(int data)
 void 
 rotate34(Tree *a, Tree *b, Tree *c, Tree *t0, Tree *t1, Tree *t2, Tree *t3)
 {
+	b->color = 0;
+	a->color = 1;
+	c->color = 1;
 	b->left = a;
 	b->right = c;
 	a->parent = b;
@@ -123,9 +126,9 @@ add(int data)
 	//父节点是黑色，直接插入
 	if (parent->color == 0) {
 		if (parent->data > data)
-			parent->right = node;
-		else 
 			parent->left = node;
+		else 
+			parent->right = node;
 		return ;
 	}
 
@@ -133,7 +136,9 @@ add(int data)
 	Tree *grandpa = parent->parent;
 	Tree *uncle = (parent == grandpa->left ? grandpa->right : grandpa->left);
 
-	//如果叔叔节点不为空，可以确定必叔叔为红色，因为父节点黑色的情况已经处理过了，叔叔节点与父节点同色。向上变色直到平衡
+	//如果叔叔节点不为空，可以确定叔叔节点必为红色，
+	//因为父节点黑色的情况已经处理过了，叔叔节点与父
+	//节点同色。向上变色直到平衡
 	if (uncle != NULL) {
 		if (node->data > parent->data)
 			parent->right = node;
@@ -161,16 +166,25 @@ add(int data)
 			parent = node->parent;
 			grandpa = parent->parent;
 		} while (node->parent->color == 1);
-	}
-
-	//如果叔叔节点不存在，需要进行旋转
-	if (uncle == NULL) {
-		if (node->data > parent->data) {
+		return ;
+	} else {
+		//如果叔叔节点不存在，需要进行旋转
+		if (grandpa->left == parent) { 
+			if (node->data > parent->data) //LL
+				rotate34(node, parent, grandpa, node->left, node->right, parent->right, grandpa->right);
+			else //LR
+				rotate34(parent, node, grandpa, parent->left, node->left, node->right, grandpa->right);
 
 		} else {
-
+			if (node->data > parent->data) //RL
+				rotate34(grandpa, node, parent, grandpa->left, node->left, node->right, parent->right);
+			else //RR
+				rotate34(grandpa, parent, node, grandpa->left, parent->left, node->left, node->right);
 		}
+		return ;
 	}
+
+	return ;
 }
 
 int
