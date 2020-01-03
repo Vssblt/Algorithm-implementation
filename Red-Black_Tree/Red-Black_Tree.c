@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <malloc.h>
 
 #ifdef __GNUC__
 #define max(x, y) ({ \
@@ -100,7 +101,7 @@ add(int data)
 		root->left = NULL;
 		root->right = NULL;
 		root->color = 0;
-		return 0;
+		return ;
 	}
 
 	//已经有了，直接返回
@@ -111,14 +112,16 @@ add(int data)
 	//查找插入点
 	Tree *parent = where_insert(data);
 
+	//创建节点
+	Tree *node = (Tree *)malloc(sizeof(Tree));
+	node->color = 1;
+	node->parent = parent;
+	node->left = NULL;
+	node->right = NULL;
+	node->data = data;
+
 	//父节点是黑色，直接插入
 	if (parent->color == 0) {
-		Tree *node = (Tree *)malloc(sizeof(Tree));
-		node->color = 1;
-		node->parent = parent;
-		node->left = NULL;
-		node->right = NULL;
-		node->data = data;
 		if (parent->data > data)
 			parent->right = node;
 		else 
@@ -133,10 +136,43 @@ add(int data)
 	//如果叔叔节点不为空，并且颜色为红色，则向上变色直到平衡
 	if (uncle != NULL) {
 		if (uncle->color == 1) {
+			if (node->data > parent->data)
+				parent->right = node;
+			else
+				parent->left = node;
+			do {
+				//变色
+				grandpa->color = 1;
+				parent->color = 0;
+				uncle->color = 0;
 
+				//判断爷爷和爷爷的父节点是否为根，做特殊处理
+				//由于根节点必须是黑色，所以如果爷爷节点是根
+				//节点，则置为黑色
+				if (grandpa == root) {
+					grandpa->color = 0;
+					break;
+				}
+				if (grandpa->parent == root) {
+					break;
+				}
+
+				//将当前插入节点指向爷爷节点，继续向上做变色操作
+				node = grandpa;
+				parent = node->parent;
+				grandpa = parent->parent;
+			} while (node->parent->color == 1);
 		}
 	}
 
+	//如果叔叔节点不存在，需要进行旋转
+	if (uncle == NULL) {
+		if (node->data > parent->data) {
+
+		} else {
+
+		}
+	}
 }
 
 int
