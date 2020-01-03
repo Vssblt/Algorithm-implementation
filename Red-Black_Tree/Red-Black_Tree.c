@@ -133,36 +133,34 @@ add(int data)
 	Tree *grandpa = parent->parent;
 	Tree *uncle = (parent == grandpa->left ? grandpa->right : grandpa->left);
 
-	//如果叔叔节点不为空，并且颜色为红色，则向上变色直到平衡
+	//如果叔叔节点不为空，可以确定必叔叔为红色，因为父节点黑色的情况已经处理过了，叔叔节点与父节点同色。向上变色直到平衡
 	if (uncle != NULL) {
-		if (uncle->color == 1) {
-			if (node->data > parent->data)
-				parent->right = node;
-			else
-				parent->left = node;
-			do {
-				//变色
-				grandpa->color = 1;
-				parent->color = 0;
-				uncle->color = 0;
+		if (node->data > parent->data)
+			parent->right = node;
+		else
+			parent->left = node;
+		do {
+			//变色
+			grandpa->color = 1;
+			parent->color = 0;
+			uncle->color = 0;
 
-				//判断爷爷和爷爷的父节点是否为根，做特殊处理
-				//由于根节点必须是黑色，所以如果爷爷节点是根
-				//节点，则置为黑色
-				if (grandpa == root) {
-					grandpa->color = 0;
-					break;
-				}
-				if (grandpa->parent == root) {
-					break;
-				}
+			//判断爷爷和爷爷的父节点是否为根，做特殊处理
+			//由于根节点必须是黑色，所以如果爷爷节点是根
+			//节点，则置为黑色
+			if (grandpa == root) {
+				grandpa->color = 0;
+				break;
+			}
+			if (grandpa->parent == root) {
+				break;
+			}
 
-				//将当前插入节点指向爷爷节点，继续向上做变色操作
-				node = grandpa;
-				parent = node->parent;
-				grandpa = parent->parent;
-			} while (node->parent->color == 1);
-		}
+			//将当前插入节点指向爷爷节点，继续向上做变色操作
+			node = grandpa;
+			parent = node->parent;
+			grandpa = parent->parent;
+		} while (node->parent->color == 1);
 	}
 
 	//如果叔叔节点不存在，需要进行旋转
