@@ -40,6 +40,8 @@ void add(int data);
 /*旋转*/
 void rotate34(Tree *a, Tree *b, Tree *c, Tree *t0, Tree *t1, Tree *t2, Tree *t3);
 
+int tree_delete(int data);
+
 void LOG(Tree *root);
 
 Tree *
@@ -187,9 +189,67 @@ add(int data)
 	return ;
 }
 
+//删除函数尚未写完，是不完整的
 int
-tree_delete()
+tree_delete(int data)
 {
+	Tree *node = search(data);
+	Tree *balance_check_node = NULL;
+	if (node == NULL) {
+		return -1;
+	}
+	Tree *parent = node->parent;
+
+	//如果删除的节点有左右孩子，寻找前驱节点，并置换位置
+	if (node->left != NULL && node->right != NULL) { 
+		Tree *pointer = node->left;
+		while(pointer->right != NULL) {
+			pointer = pointer->right;
+		}
+		node->data = pointer->data;
+		node = pointer;
+		parent = node->parent;
+	}
+
+	//叶节点，直接删除
+	if (node->left == node->right) { 
+		if (parent == NULL) {
+			root = NULL;
+			free(node);
+			return 0;
+		}
+		if (parent->left == node)
+			parent->left = NULL;
+		else
+			parent->right = NULL;
+		free(node);
+		balance_check_node = parent;
+	} else if (node->left != node->right) { 
+		//被删除的节点有一个子节点，则将子节点代替删除节点
+		Tree *child = NULL;
+		Tree *parent = node->parent;
+
+		if (node->left != NULL)
+			child = node->left;
+		else
+			child = node->right;
+
+		if (parent != NULL) {
+			if (node == parent->left)
+				parent->left = child;
+			else
+				parent->right = child;
+		} else {
+			root = child;
+		}
+
+		child->parent = parent;
+
+		free(node);
+		balance_check_node = parent;
+	}
+
+	/*向上检查平衡性*/
 
 	return 0;
 }
