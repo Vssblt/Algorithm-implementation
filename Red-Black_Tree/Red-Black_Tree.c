@@ -139,9 +139,8 @@ add(int data)
 	Tree *uncle = (parent == grandpa->left ? grandpa->right : grandpa->left);
 
 	//如果叔叔节点不为空，可以确定叔叔节点必为红色，
-	//因为父节点黑色的情况已经处理过了，叔叔节点不可
-	//能为黑色，否则爷爷节点的左右子树黑色节点就不平
-	//衡了
+	//因为父节点黑色的情况已经处理过了，叔叔节点与父
+	//节点同色。向上变色直到平衡
 	if (uncle != NULL) {
 		if (node->data > parent->data)
 			parent->right = node;
