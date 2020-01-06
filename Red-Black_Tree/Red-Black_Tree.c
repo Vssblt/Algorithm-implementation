@@ -170,56 +170,52 @@ add(int data)
 	
 		} else {
 			//如果叔叔节点不存在，需要进行旋转
-			if (grandpa->left == parent) { 
-				if (node->data > parent->data) { //LL
-					parent->parent = grandpa->parent;
-					if (grandpa->parent != NULL) {
-						if (grandpa->parent->left == grandpa)
-							grandpa->parent->left = parent;
-						else
-							grandpa->parent->right = parent;
-					} else {
-						root = parent;
-					}
-					rotate34(node, parent, grandpa, node->left, node->right, parent->right, grandpa->right);
-					node = parent;
-				} else { //LR
-					node->parent = grandpa->parent;
-					if (grandpa->parent != NULL) {
-						if (grandpa->parent->left == grandpa)
-							grandpa->parent->left = node;
-						else
-							grandpa->parent->right = node;
-					} else {
-						root = node;
-					}
-					rotate34(parent, node, grandpa, parent->left, node->left, node->right, grandpa->right);
+			if (grandpa->left == parent && node->data > parent->data) { //LL
+				parent->parent = grandpa->parent;
+				if (grandpa->parent != NULL) {
+					if (grandpa->parent->left == grandpa)
+						grandpa->parent->left = parent;
+					else
+						grandpa->parent->right = parent;
+				} else {
+					root = parent;
 				}
-			} else {
-				if (node->data < parent->data) { //RL
-					node->parent = grandpa->parent;
-					if (grandpa->parent != NULL) {
-						if (grandpa->parent->left == grandpa)
-							grandpa->parent->left = node;
-						else
-							grandpa->parent->right = node;
-					} else {
-						root = node;
-					}
-					rotate34(grandpa, node, parent, grandpa->left, node->left, node->right, parent->right);
-				} else { //RR
-					parent->parent = grandpa->parent;
-					if (grandpa->parent != NULL) {
-						if (grandpa->parent->left == grandpa)
-							grandpa->parent->left = parent;
-						else
-							grandpa->parent->right = parent;
-					} else {
-						root = parent;
-					}
-					rotate34(grandpa, parent, node, grandpa->left, parent->left, node->left, node->right);
-					node = parent;
+				rotate34(node, parent, grandpa, node->left, node->right, parent->right, grandpa->right);
+				node = parent;
+			} else if (grandpa->left == parent && node->data < parent->data) { //LR
+				node->parent = grandpa->parent;
+				if (grandpa->parent != NULL) {
+					if (grandpa->parent->left == grandpa)
+						grandpa->parent->left = node;
+					else
+						grandpa->parent->right = node;
+				} else {
+					root = node;
 				}
+				rotate34(parent, node, grandpa, parent->left, node->left, node->right, grandpa->right);
+			} else if (grandpa->right == parent && node->data < parent->data) { //RL 
+				node->parent = grandpa->parent;
+				if (grandpa->parent != NULL) {
+					if (grandpa->parent->left == grandpa)
+						grandpa->parent->left = node;
+					else
+						grandpa->parent->right = node;
+				} else {
+					root = node;
+				}
+				rotate34(grandpa, node, parent, grandpa->left, node->left, node->right, parent->right);
+			} else if (grandpa->right == parent && node->data > parent->data) { //RR
+				parent->parent = grandpa->parent;
+				if (grandpa->parent != NULL) {
+					if (grandpa->parent->left == grandpa)
+						grandpa->parent->left = parent;
+					else
+						grandpa->parent->right = parent;
+				} else {
+					root = parent;
+				}
+				rotate34(grandpa, parent, node, grandpa->left, parent->left, node->left, node->right);
+				node = parent;
 			}
 		}
 		parent = node->parent;
