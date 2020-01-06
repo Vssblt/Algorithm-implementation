@@ -44,6 +44,8 @@ int tree_delete(int data);
 
 void LOG(Tree *root);
 
+void rebalance(Tree *node, Tree *parent, Tree *grandpa, Tree *uncle);
+
 Tree *
 search(int data)
 {
@@ -144,86 +146,8 @@ add(int data)
 	else
 		parent->left = node;
 
-	do {
-		int yesorno = 0;
-		if (uncle != NULL) {
-			if (uncle->color == 1)
-				yesorno = 1;
-		}
-		if (yesorno) {
-			//变色
-			grandpa->color = 1;
-			parent->color = 0;
-			uncle->color = 0;
-	
-			//判断爷爷和爷爷的父节点是否为根，做特殊处理
-			//由于根节点必须是黑色，所以如果爷爷节点是根
-			//节点，则置为黑色
-			if (grandpa == root) {
-				grandpa->color = 0;
-				break;
-			}
-			if (grandpa->parent == root) {
-				break;
-			}
-			node = grandpa;
-	
-		} else {
-			//如果叔叔节点不存在，需要进行旋转
-			if (grandpa->left == parent && node->data > parent->data) { //LL
-				parent->parent = grandpa->parent;
-				if (grandpa->parent != NULL) {
-					if (grandpa->parent->left == grandpa)
-						grandpa->parent->left = parent;
-					else
-						grandpa->parent->right = parent;
-				} else {
-					root = parent;
-				}
-				rotate34(node, parent, grandpa, node->left, node->right, parent->right, grandpa->right);
-				node = parent;
-			} else if (grandpa->left == parent && node->data < parent->data) { //LR
-				node->parent = grandpa->parent;
-				if (grandpa->parent != NULL) {
-					if (grandpa->parent->left == grandpa)
-						grandpa->parent->left = node;
-					else
-						grandpa->parent->right = node;
-				} else {
-					root = node;
-				}
-				rotate34(parent, node, grandpa, parent->left, node->left, node->right, grandpa->right);
-			} else if (grandpa->right == parent && node->data < parent->data) { //RL 
-				node->parent = grandpa->parent;
-				if (grandpa->parent != NULL) {
-					if (grandpa->parent->left == grandpa)
-						grandpa->parent->left = node;
-					else
-						grandpa->parent->right = node;
-				} else {
-					root = node;
-				}
-				rotate34(grandpa, node, parent, grandpa->left, node->left, node->right, parent->right);
-			} else if (grandpa->right == parent && node->data > parent->data) { //RR
-				parent->parent = grandpa->parent;
-				if (grandpa->parent != NULL) {
-					if (grandpa->parent->left == grandpa)
-						grandpa->parent->left = parent;
-					else
-						grandpa->parent->right = parent;
-				} else {
-					root = parent;
-				}
-				rotate34(grandpa, parent, node, grandpa->left, parent->left, node->left, node->right);
-				node = parent;
-			}
-		}
-		parent = node->parent;
-		if (parent == NULL || parent == root)
-			break;
-		grandpa = parent->parent;
-		uncle = (parent == grandpa->left ? grandpa->right : grandpa->left);
-	} while (node->parent->color == 1 && node->color == 1);
+	//平衡性检查和修正
+	rebalance(node, parent, grandpa, uncle);
 
 	return ;
 }
@@ -289,9 +213,93 @@ tree_delete(int data)
 	}
 
 	/*向上检查平衡性*/
-
+//	rebalance();
 	return 0;
 }
+
+void 
+rebalance(Tree *node, Tree *parent, Tree *grandpa, Tree *uncle)
+{
+	do {
+		int yesorno = 0;
+		if (uncle != NULL) {
+			if (uncle->color == 1)
+				yesorno = 1;
+		}
+		if (yesorno) {     //如果叔叔节点存在且为红色，则进行变色
+			grandpa->color = 1;
+			parent->color = 0;
+			uncle->color = 0;
+	
+			//判断爷爷和爷爷的父节点是否为根，做特殊处理
+			//由于根节点必须是黑色，所以如果爷爷节点是根
+			//节点，则置为黑色
+			if (grandpa == root) {
+				grandpa->color = 0;
+				break;
+			}
+			if (grandpa->parent == root) {
+				break;
+			}
+			node = grandpa;
+	
+		} else {          //如果叔叔节点不存在或为黑色，则需要进行旋转
+			if (grandpa->left == parent && node->data > parent->data) { //LL
+				parent->parent = grandpa->parent;
+				if (grandpa->parent != NULL) {
+					if (grandpa->parent->left == grandpa)
+						grandpa->parent->left = parent;
+					else
+						grandpa->parent->right = parent;
+				} else {
+					root = parent;
+				}
+				rotate34(node, parent, grandpa, node->left, node->right, parent->right, grandpa->right);
+				node = parent;
+			} else if (grandpa->left == parent && node->data < parent->data) { //LR
+				node->parent = grandpa->parent;
+				if (grandpa->parent != NULL) {
+					if (grandpa->parent->left == grandpa)
+						grandpa->parent->left = node;
+					else
+						grandpa->parent->right = node;
+				} else {
+					root = node;
+				}
+				rotate34(parent, node, grandpa, parent->left, node->left, node->right, grandpa->right);
+			} else if (grandpa->right == parent && node->data < parent->data) { //RL 
+				node->parent = grandpa->parent;
+				if (grandpa->parent != NULL) {
+					if (grandpa->parent->left == grandpa)
+						grandpa->parent->left = node;
+					else
+						grandpa->parent->right = node;
+				} else {
+					root = node;
+				}
+				rotate34(grandpa, node, parent, grandpa->left, node->left, node->right, parent->right);
+			} else if (grandpa->right == parent && node->data > parent->data) { //RR
+				parent->parent = grandpa->parent;
+				if (grandpa->parent != NULL) {
+					if (grandpa->parent->left == grandpa)
+						grandpa->parent->left = parent;
+					else
+						grandpa->parent->right = parent;
+				} else {
+					root = parent;
+				}
+				rotate34(grandpa, parent, node, grandpa->left, parent->left, node->left, node->right);
+				node = parent;
+			}
+		}
+		parent = node->parent;
+		if (parent == NULL || parent == root)
+			break;
+		grandpa = parent->parent;
+		uncle = (parent == grandpa->left ? grandpa->right : grandpa->left);
+	} while (node->parent->color == 1 && node->color == 1);
+}
+
 
 int
 main()
