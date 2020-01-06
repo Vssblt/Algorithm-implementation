@@ -138,20 +138,24 @@ add(int data)
 	Tree *grandpa = parent->parent;
 	Tree *uncle = (parent == grandpa->left ? grandpa->right : grandpa->left);
 
-	//如果叔叔节点不为空，可以确定叔叔节点必为红色，
-	//因为父节点黑色的情况已经处理过了，叔叔节点与父
-	//节点同色。向上变色直到平衡
-	if (uncle != NULL) {
-		if (node->data > parent->data)
-			parent->right = node;
-		else
-			parent->left = node;
-		do {
+	//将节点加入树中
+	if (node->data > parent->data)
+		parent->right = node;
+	else
+		parent->left = node;
+
+	do {
+		int yesorno = 0;
+		if (uncle != NULL) {
+			if (uncle->color == 1)
+				yesorno = 1;
+		}
+		if (yesorno) {
 			//变色
 			grandpa->color = 1;
 			parent->color = 0;
 			uncle->color = 0;
-
+	
 			//判断爷爷和爷爷的父节点是否为根，做特殊处理
 			//由于根节点必须是黑色，所以如果爷爷节点是根
 			//节点，则置为黑色
@@ -162,29 +166,68 @@ add(int data)
 			if (grandpa->parent == root) {
 				break;
 			}
-
-			//将当前插入节点指向爷爷节点，继续向上做变色操作
 			node = grandpa;
-			parent = node->parent;
-			grandpa = parent->parent;
-		} while (node->parent->color == 1);
-		return ;
-	} else {
-		//如果叔叔节点不存在，需要进行旋转
-		if (grandpa->left == parent) { 
-			if (node->data > parent->data) //LL
-				rotate34(node, parent, grandpa, node->left, node->right, parent->right, grandpa->right);
-			else //LR
-				rotate34(parent, node, grandpa, parent->left, node->left, node->right, grandpa->right);
-
+	
 		} else {
-			if (node->data > parent->data) //RL
-				rotate34(grandpa, node, parent, grandpa->left, node->left, node->right, parent->right);
-			else //RR
-				rotate34(grandpa, parent, node, grandpa->left, parent->left, node->left, node->right);
+			//如果叔叔节点不存在，需要进行旋转
+			if (grandpa->left == parent) { 
+				if (node->data > parent->data) { //LL
+					parent->parent = grandpa->parent;
+					if (grandpa->parent != NULL) {
+						if (grandpa->parent->left == grandpa)
+							grandpa->parent->left = parent;
+						else
+							grandpa->parent->right = parent;
+					} else {
+						root = parent;
+					}
+					rotate34(node, parent, grandpa, node->left, node->right, parent->right, grandpa->right);
+					node = parent;
+				} else { //LR
+					node->parent = grandpa->parent;
+					if (grandpa->parent != NULL) {
+						if (grandpa->parent->left == grandpa)
+							grandpa->parent->left = node;
+						else
+							grandpa->parent->right = node;
+					} else {
+						root = node;
+					}
+					rotate34(parent, node, grandpa, parent->left, node->left, node->right, grandpa->right);
+				}
+			} else {
+				if (node->data < parent->data) { //RL
+					node->parent = grandpa->parent;
+					if (grandpa->parent != NULL) {
+						if (grandpa->parent->left == grandpa)
+							grandpa->parent->left = node;
+						else
+							grandpa->parent->right = node;
+					} else {
+						root = node;
+					}
+					rotate34(grandpa, node, parent, grandpa->left, node->left, node->right, parent->right);
+				} else { //RR
+					parent->parent = grandpa->parent;
+					if (grandpa->parent != NULL) {
+						if (grandpa->parent->left == grandpa)
+							grandpa->parent->left = parent;
+						else
+							grandpa->parent->right = parent;
+					} else {
+						root = parent;
+					}
+					rotate34(grandpa, parent, node, grandpa->left, parent->left, node->left, node->right);
+					node = parent;
+				}
+			}
 		}
-		return ;
-	}
+		parent = node->parent;
+		if (parent == NULL || parent == root)
+			break;
+		grandpa = parent->parent;
+		uncle = (parent == grandpa->left ? grandpa->right : grandpa->left);
+	} while (node->parent->color == 1 && node->color == 1);
 
 	return ;
 }
@@ -257,6 +300,7 @@ tree_delete(int data)
 int
 main()
 {
+	/*
 	int n = 0, is_del = 0, del_num = 0;
 	printf("Please input size of tree: ");
 	scanf("%d", &n);
@@ -266,6 +310,13 @@ main()
 		add(data);
 	}
 	getchar();
+	*/
+
+	int test_data[16] = {0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15};
+	int n = 16, is_del = 0, del_num = 0;
+	for (int i = 0; i < n; i++) {
+		add(test_data[i]);
+	}
 
 	printf("Do you want delete nodes? (y/n)");
 	is_del = getchar();
