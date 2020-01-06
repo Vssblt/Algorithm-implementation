@@ -34,14 +34,17 @@ Tree *search(int data);
  * 用前使用search进行搜索 */
 Tree *where_insert(int data);
 
-/*传入数据，插入数据到当前树中*/
+/* 传入数据，插入数据到当前树中 */
 void add(int data);
 
-/*旋转*/
+/* 旋转 */
 void rotate34(Tree *a, Tree *b, Tree *c, Tree *t0, Tree *t1, Tree *t2, Tree *t3);
+void rebalance(Tree *node);
 
+/* 删除节点 */
 int tree_delete(int data);
 
+/* 遍历输出 */
 void LOG(Tree *root);
 
 Tree *
@@ -138,10 +141,15 @@ add(int data)
 	Tree *grandpa = parent->parent;
 	Tree *uncle = (parent == grandpa->left ? grandpa->right : grandpa->left);
 
-	//如果叔叔节点不为空，可以确定叔叔节点必为红色，
-	//因为父节点黑色的情况已经处理过了，叔叔节点与父
-	//节点同色。向上变色直到平衡
+	//分两种情况处理，1、uncle存在并且为红。2、uncle不存在或为黑色。
+	int yesorno = 0;
 	if (uncle != NULL) {
+		if (uncle->color == 0)
+			yesorno = 1;
+	} else {
+		yesorno = 1;
+	}
+	if (!yesorno) {
 		if (node->data > parent->data)
 			parent->right = node;
 		else
@@ -170,7 +178,7 @@ add(int data)
 		} while (node->parent->color == 1);
 		return ;
 	} else {
-		//如果叔叔节点不存在，需要进行旋转
+		//如果叔叔节点不存在或为黑色，需要进行旋转
 		if (grandpa->left == parent) { 
 			if (node->data > parent->data) //LL
 				rotate34(node, parent, grandpa, node->left, node->right, parent->right, grandpa->right);
@@ -246,12 +254,19 @@ tree_delete(int data)
 		child->parent = parent;
 
 		free(node);
-		balance_check_node = parent;
+		balance_check_node = child;
 	}
 
 	/*向上检查平衡性*/
-
+	rebalance(balance_check_node);
 	return 0;
+}
+
+void 
+rebalance(Tree *node)
+{
+
+
 }
 
 int
