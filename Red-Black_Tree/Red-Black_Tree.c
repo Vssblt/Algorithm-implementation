@@ -46,6 +46,8 @@ void LOG(Tree *root);
 
 void add_rebalance(Tree *node, Tree *parent, Tree *grandpa, Tree *uncle);
 
+void del_rebalance();
+
 Tree *
 search(int data)
 {
@@ -242,7 +244,7 @@ tree_delete(int data)
 	Tree *node = search(data);
 	Tree *balance_check_node = NULL;
 	if (node == NULL) {
-		return -1;
+		goto ERR_RET;
 	}
 	Tree *parent = node->parent;
 
@@ -257,19 +259,19 @@ tree_delete(int data)
 		parent = node->parent;
 	}
 
-	//叶节点，直接删除
+	//叶节点，删除，如果节点是红色，直接返回，否则进行再平衡
 	if (node->left == node->right) { 
 		if (parent == NULL) {
 			root = NULL;
-			free(node);
-			return 0;
+			goto RET;
 		}
 		if (parent->left == node)
 			parent->left = NULL;
 		else
 			parent->right = NULL;
-		free(node);
 		balance_check_node = parent;
+		if (node->color == 1)
+			goto RET;
 	} else if (node->left != node->right) { 
 		//被删除的节点有一个子节点，则将子节点代替删除节点
 		Tree *child = NULL;
@@ -291,12 +293,25 @@ tree_delete(int data)
 
 		child->parent = parent;
 
-		free(node);
 		balance_check_node = parent;
 	}
 
-	/*向上检查平衡性*/
+
+REBALANCE:	
+	free(node);
+	del_rebalance();
 	return 0;
+RET:	
+	free(node);
+	return 0;
+
+ERR_RET:
+	return 0;
+}
+
+void del_rebalance()
+{
+
 }
 
 int
