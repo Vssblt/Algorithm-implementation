@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <malloc.h>
 
+#define INPUT_DATA
+
 #ifdef __GNUC__
 #define max(x, y) ({ \
 	typeof(x) _max1 = (x); \
@@ -317,7 +319,7 @@ void del_rebalance()
 int
 main()
 {
-	/*
+#ifdef INPUT_DATA
 	int n = 0, is_del = 0, del_num = 0;
 	printf("Please input size of tree: ");
 	scanf("%d", &n);
@@ -327,14 +329,13 @@ main()
 		add(data);
 	}
 	getchar();
-	*/
-
+#else
 	int test_data[16] = {0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15};
 	int n = 16, is_del = 0, del_num = 0;
 	for (int i = 0; i < n; i++) {
 		add(test_data[i]);
 	}
-
+#endif
 	printf("Do you want delete nodes? (y/n)");
 	is_del = getchar();
 	if (0x59 != is_del && 0x79 != is_del) {
