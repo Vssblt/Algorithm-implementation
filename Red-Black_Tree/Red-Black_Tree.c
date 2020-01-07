@@ -274,6 +274,7 @@ tree_delete(int data)
 		balance_check_node = parent;
 		if (node->color == 1)
 			goto RET;
+		goto REBALANCE;
 	} else if (node->left != node->right) { 
 		//被删除的节点有一个子节点，则将子节点代替删除节点
 		Tree *child = NULL;
@@ -296,13 +297,15 @@ tree_delete(int data)
 		child->parent = parent;
 
 		balance_check_node = parent;
+		goto REBALANCE;
 	}
 
 
 REBALANCE:	
 	free(node);
-	del_rebalance();
+	del_rebalance(balance_check_node);
 	return 0;
+
 RET:	
 	free(node);
 	return 0;
@@ -311,9 +314,9 @@ ERR_RET:
 	return 0;
 }
 
-void del_rebalance()
+void del_rebalance(Tree *node)
 {
-
+	
 }
 
 int
