@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <malloc.h>
 
-#define INPUT_DATA
+//#define INPUT_DATA
 
 #ifdef __GNUC__
 #define max(x, y) ({ \
@@ -26,7 +26,7 @@ typedef struct Tree{
 
 Tree *root = NULL;
 
-int search(int data, Tree *node);
+int search(int data, Tree **node);
 
 
 /*传入数据，插入数据到当前树中*/
@@ -44,7 +44,7 @@ void add_rebalance(Tree *node, Tree *parent, Tree *grandpa, Tree *uncle);
 void del_rebalance(Tree *node);
 
 int
-search(int data, Tree *node)
+search(int data, Tree **node)
 {
 	Tree *pointer = root, *parent = NULL;
 	while (pointer != NULL) {
@@ -54,11 +54,11 @@ search(int data, Tree *node)
 		} else if (pointer->data > data) {
 			pointer = pointer->left;
 		} else {
-			node = pointer;
+			*node = pointer;
 			return 0;
 		}
 	}
-	node = parent;
+	*node = parent;
 	return 1;
 }
 
@@ -86,7 +86,7 @@ void
 add(int data)
 {
 	Tree *search_temp = NULL;
-	Tree *parent;
+	Tree *parent = NULL;
 	//根为空，直接插入
 	if (root == NULL) {
 		root = (Tree *)malloc(sizeof(Tree));
@@ -99,7 +99,7 @@ add(int data)
 	}
 
 	//查找插入点
-	if (0 == search(data, parent)) {
+	if (0 == search(data, &parent)) {
 		return ;
 	}
 
@@ -227,7 +227,7 @@ tree_delete(int data)
 	Tree *child = NULL;
 	Tree *parent = NULL;
 
-	if (1 == search(data, node)) {
+	if (1 == search(data, &node)) {
 		return 0;
 	}
 	parent = node->parent;
@@ -265,21 +265,20 @@ tree_delete(int data)
 		child->parent = parent;
 
 	}
-	//叶节点，删除，如果节点是红色，直接返回，否则进行再平衡
+	//叶节点，删除，如果节点是红色，直接删除返回，否则进行再平衡
 	if (node->left == node->right) { 
 		if (parent == NULL) {
 			root = NULL;
 			free(node);
 			return 0;
 		}
-		if (node->color == 1) {
-			if (parent->left == node)
-				parent->left = NULL;
-			else
-				parent->right = NULL;
-		} else {
+		if (node->color == 0) {
 			del_rebalance(node);
 		}
+		if (parent->left == node)
+			parent->left = NULL;
+		else
+			parent->right = NULL;
 	}
 	free(node);
 	return 0;
@@ -288,8 +287,8 @@ tree_delete(int data)
 void 
 del_rebalance(Tree *node)
 {
-	parent = node->parent;
-	brother = (parent->left == node ? parent->right : parent->left);
+	Tree *parent = node->parent;
+	Tree *brother = (parent->left == node ? parent->right : parent->left);
 
 	//如果兄弟为红色，则进行变色和旋转，变化后依旧无法直接删除，
 	//但是经过操作后，兄弟节点将转化为黑色。
@@ -336,7 +335,7 @@ del_rebalance(Tree *node)
 				node, brother->left, brother->right->left, brother->right->right);
 		}
 	} else if (parent->right == node && brother->left != brother->right) {
-		if (brother->left != null) { //LL
+		if (brother->left != NULL) { //LL
 			if (parent == root)
 				root = brother;
 			temp_color = parent->color;
@@ -345,7 +344,7 @@ del_rebalance(Tree *node)
 			brother->left->color = 0;
 			rotate34(brother->left, brother, parent, 
 				brother->left, brother->right, brother->right, node);
-		else { //LR
+		} else { //LR
 			if (parent == root)
 				root = brother->right;
 			brother->right->color = parent->color;
@@ -353,18 +352,13 @@ del_rebalance(Tree *node)
 			rotate34(brother, brother->right, parent, 
 				brother->left, brother->right->left, brother->right->right, node);
 		}
-	} else if (parent->right == node && brother->left == brother->right) {
+	} else if (brother->left == brother->right) {
 		if (parent->color == 0) {
-
+			brother->color = 1;
 		} else {
-
-
-
+			parent->color = 0;
+			brother->color = 1;
 		}
-
-	} else if (parent->left == node && brother->right == brother->left){
-
-
 	}
 }
 
