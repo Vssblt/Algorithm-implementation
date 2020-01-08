@@ -222,7 +222,6 @@ add_rebalance(Tree *node, Tree *parent, Tree *grandpa, Tree *uncle)
 	} while (node->parent->color == 1 && node->color == 1);
 }
 
-//删除函数尚未写完，是不完整的
 int
 tree_delete(int data)
 {
