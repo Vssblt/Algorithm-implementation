@@ -26,15 +26,8 @@ typedef struct Tree{
 
 Tree *root = NULL;
 
-/* 传入数据，查找数据是否存在
- * 如果不存在返回NULL，否则返回
- * 相应的节点指针 */
-Tree *search(int data);
+int search(int data, Tree *node);
 
-/* 传入数据，查找插入位置，禁
- * 止传入已存在的数据，请在调
- * 用前使用search进行搜索 */
-Tree *where_insert(int data);
 
 /*传入数据，插入数据到当前树中*/
 void add(int data);
@@ -48,26 +41,10 @@ void LOG(Tree *root);
 
 void add_rebalance(Tree *node, Tree *parent, Tree *grandpa, Tree *uncle);
 
-void del_rebalance();
+void del_rebalance(Tree *node, int type);
 
-Tree *
-search(int data)
-{
-	Tree *pointer = root;
-	while (pointer != NULL) {
-		if (data > pointer->data) {
-			pointer = pointer->right;
-		} else if (data < pointer->data) {
-			pointer = pointer->left;
-		} else {
-			return pointer;
-		}
-	}
-	return NULL;
-}
-
-Tree *
-where_insert(int data)
+int
+search(int data, Tree *node)
 {
 	Tree *pointer = root, *parent = NULL;
 	while (pointer != NULL) {
@@ -76,9 +53,13 @@ where_insert(int data)
 			pointer = pointer->right;
 		} else if (pointer->data > data) {
 			pointer = pointer->left;
+		} else {
+			node = pointer;
+			return 0;
 		}
 	}
-	return parent;
+	node = parent;
+	return 1;
 }
 
 void 
@@ -104,6 +85,8 @@ rotate34(Tree *a, Tree *b, Tree *c, Tree *t0, Tree *t1, Tree *t2, Tree *t3)
 void 
 add(int data)
 {
+	Tree *search_temp = NULL;
+	Tree *parent;
 	//根为空，直接插入
 	if (root == NULL) {
 		root = (Tree *)malloc(sizeof(Tree));
@@ -115,13 +98,10 @@ add(int data)
 		return ;
 	}
 
-	//已经有了，直接返回
-	if (NULL != search(data)) {
+	//查找插入点
+	if (0 == search(data, parent)) {
 		return ;
 	}
-
-	//查找插入点
-	Tree *parent = where_insert(data);
 
 	//创建节点
 	Tree *node = (Tree *)malloc(sizeof(Tree));
@@ -243,12 +223,14 @@ add_rebalance(Tree *node, Tree *parent, Tree *grandpa, Tree *uncle)
 int
 tree_delete(int data)
 {
-	Tree *node = search(data);
-	Tree *balance_check_node = NULL;
-	if (node == NULL) {
-		goto ERR_RET;
+	Tree *node = NULL;
+	Tree *child = NULL;
+	Tree *parent = NULL;
+
+	if (1 == search(data, node)) {
+		return 0;
 	}
-	Tree *parent = node->parent;
+	parent = node->parent;
 
 	//如果删除的节点有左右孩子，寻找前驱节点，并置换位置
 	if (node->left != NULL && node->right != NULL) { 
@@ -261,25 +243,11 @@ tree_delete(int data)
 		parent = node->parent;
 	}
 
-	//叶节点，删除，如果节点是红色，直接返回，否则进行再平衡
-	if (node->left == node->right) { 
-		if (parent == NULL) {
-			root = NULL;
-			goto RET;
-		}
-		if (parent->left == node)
-			parent->left = NULL;
-		else
-			parent->right = NULL;
-		balance_check_node = parent;
-		if (node->color == 1)
-			goto RET;
-		goto REBALANCE;
-	} else if (node->left != node->right) { 
-		//被删除的节点有一个子节点，则将子节点代替删除节点
-		Tree *child = NULL;
-		Tree *parent = node->parent;
-
+	if (node->left != node->right) { 
+		//被删除的节点有一个子节点，则将子节点代替删除节点，
+		//并将替换后的节点置为黑色。注意：因为只有一个子节点，
+		//所以该节点只能是黑色，其子节点只能是红色，否则会破
+		//坏黑色完美平衡
 		if (node->left != NULL)
 			child = node->left;
 		else
@@ -293,30 +261,33 @@ tree_delete(int data)
 		} else {
 			root = child;
 		}
-
+		child->color = 0;
 		child->parent = parent;
 
-		balance_check_node = parent;
-		goto REBALANCE;
+		free(node);
+		return 0;
 	}
+	//叶节点，删除，如果节点是红色，直接返回，否则进行再平衡
+	if (node->left == node->right) { 
+		if (parent == NULL) {
+			root = NULL;
+			free(node);
+			return 0;
+		}
+		if (node->color == 1) {
+			if (parent->left == node)
+				parent->left = NULL;
+			else
+				parent->right = NULL;
+			free(node);
+			return 0;
+		} else {
 
 
-REBALANCE:	
-	free(node);
-	del_rebalance(balance_check_node);
+
+		}
+	}
 	return 0;
-
-RET:	
-	free(node);
-	return 0;
-
-ERR_RET:
-	return 0;
-}
-
-void del_rebalance(Tree *node)
-{
-	
 }
 
 int
