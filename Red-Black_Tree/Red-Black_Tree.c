@@ -33,7 +33,7 @@ int search(int data, Tree **node);
 void add(int data);
 
 /*旋转*/
-void rotate34(Tree *a, Tree *b, Tree *c, Tree *t0, Tree *t1, Tree *t2, Tree *t3);
+void rotate34(Tree *a, Tree *b, Tree *c, Tree *t0, Tree *t1, Tree *t2, Tree *t3, int type);
 
 int tree_delete(int data);
 
@@ -63,11 +63,14 @@ search(int data, Tree **node)
 }
 
 void 
-rotate34(Tree *a, Tree *b, Tree *c, Tree *t0, Tree *t1, Tree *t2, Tree *t3)
+rotate34(Tree *a, Tree *b, Tree *c, Tree *t0, Tree *t1, Tree *t2, Tree *t3, int type)
 {
-	b->color = 0;
-	a->color = 1;
-	c->color = 1;
+	if (type == 1)
+	{
+		b->color = 0;
+		a->color = 1;
+		c->color = 1;
+	}
 	b->left = a;
 	b->right = c;
 	a->parent = b;
@@ -173,7 +176,7 @@ add_rebalance(Tree *node, Tree *parent, Tree *grandpa, Tree *uncle)
 				} else {
 					root = parent;
 				}
-				rotate34(node, parent, grandpa, node->left, node->right, parent->right, grandpa->right);
+				rotate34(node, parent, grandpa, node->left, node->right, parent->right, grandpa->right, 1);
 				node = parent;
 			} else if (grandpa->left == parent && node->data < parent->data) { //LR
 				node->parent = grandpa->parent;
@@ -185,7 +188,7 @@ add_rebalance(Tree *node, Tree *parent, Tree *grandpa, Tree *uncle)
 				} else {
 					root = node;
 				}
-				rotate34(parent, node, grandpa, parent->left, node->left, node->right, grandpa->right);
+				rotate34(parent, node, grandpa, parent->left, node->left, node->right, grandpa->right, 1);
 			} else if (grandpa->right == parent && node->data < parent->data) { //RL 
 				node->parent = grandpa->parent;
 				if (grandpa->parent != NULL) {
@@ -196,7 +199,7 @@ add_rebalance(Tree *node, Tree *parent, Tree *grandpa, Tree *uncle)
 				} else {
 					root = node;
 				}
-				rotate34(grandpa, node, parent, grandpa->left, node->left, node->right, parent->right);
+				rotate34(grandpa, node, parent, grandpa->left, node->left, node->right, parent->right, 1);
 			} else if (grandpa->right == parent && node->data > parent->data) { //RR
 				parent->parent = grandpa->parent;
 				if (grandpa->parent != NULL) {
@@ -207,7 +210,7 @@ add_rebalance(Tree *node, Tree *parent, Tree *grandpa, Tree *uncle)
 				} else {
 					root = parent;
 				}
-				rotate34(grandpa, parent, node, grandpa->left, parent->left, node->left, node->right);
+				rotate34(grandpa, parent, node, grandpa->left, parent->left, node->left, node->right, 1);
 				node = parent;
 			}
 		}
@@ -301,13 +304,17 @@ del_rebalance(Tree *node)
 		//如果删除节点是左孩子
 		if (parent == root)
 			root = brother;
+		
+		if (parent->parent->left == parent)
+			parent->parent->left = brother;
+		else
+			parent->parent->right = brother;
+		
 		if (parent->left == node) {
-			rotate34(parent, brother, brother->right, 
-				node, brother->left, brother->right->left, brother->right->right);
+			rotate34(parent, brother, brother->right, node, brother->left, brother->right->left, brother->right->right, 0);
 		//否则
 		} else {
-			rotate34(brother->left, brother, parent, 
-				brother->left->left, brother->left->right, brother->right, node);
+			rotate34(brother->left, brother, parent, brother->left->left, brother->left->right, brother->right, node, 0);
 		}
 		//兄弟节点变了，重新计算
 		brother = (parent->left == node ? parent->right : parent->left);
@@ -322,8 +329,12 @@ del_rebalance(Tree *node)
 				root = brother->left;
 			brother->left->color = parent->color;
 			parent->color = 0;
-			rotate34(parent, brother->left, brother, 
-				node, brother->left, brother->right, brother->right);
+			
+			if (parent->parent->left == parent)
+				parent->parent->left = brother->left;
+			else
+				parent->parent->right = brother->left;
+			rotate34(parent, brother->left, brother, node, brother->left, brother->right, brother->right, 0);
 		} else { //RR
 			temp_color = parent->color;
 			parent->color = brother->color;
@@ -331,8 +342,13 @@ del_rebalance(Tree *node)
 			brother->right->color = 0;
 			if (parent == root)
 				root = brother;
-			rotate34(parent, brother, brother->right, 
-				node, brother->left, brother->right->left, brother->right->right);
+
+
+			if (parent->parent->left == parent)
+				parent->parent->left = brother;
+			else
+				parent->parent->right = brother;
+			rotate34(parent, brother, brother->right, node, brother->left, brother->right->left, brother->right->right, 0);
 		}
 	} else if (parent->right == node && brother->left != brother->right) {
 		if (brother->left != NULL) { //LL
@@ -342,15 +358,23 @@ del_rebalance(Tree *node)
 			parent->color = brother->color;
 			brother->color = temp_color;
 			brother->left->color = 0;
-			rotate34(brother->left, brother, parent, 
-				brother->left, brother->right, brother->right, node);
+
+			if (parent->parent->left == parent)
+				parent->parent->left = brother;
+			else
+				parent->parent->right = brother;
+			rotate34(brother->left, brother, parent, brother->left, brother->right, brother->right, node, 0);
 		} else { //LR
 			if (parent == root)
 				root = brother->right;
 			brother->right->color = parent->color;
 			parent->color = 0;
-			rotate34(brother, brother->right, parent, 
-				brother->left, brother->right->left, brother->right->right, node);
+
+			if (parent->parent->left == parent)
+				parent->parent->left = brother->right;
+			else
+				parent->parent->right = brother->right;
+			rotate34(brother, brother->right, parent, brother->left, brother->right->left, brother->right->right, node, 0);
 		}
 	} else if (brother->left == brother->right) {
 		if (parent->color == 0) {
