@@ -41,7 +41,7 @@ void LOG(Tree *root);
 
 void add_rebalance(Tree *node, Tree *parent, Tree *grandpa, Tree *uncle);
 
-void del_rebalance(Tree *node, int type);
+void del_rebalance(Tree *node);
 
 int
 search(int data, Tree *node)
@@ -264,8 +264,6 @@ tree_delete(int data)
 		child->color = 0;
 		child->parent = parent;
 
-		free(node);
-		return 0;
 	}
 	//叶节点，删除，如果节点是红色，直接返回，否则进行再平衡
 	if (node->left == node->right) { 
@@ -279,15 +277,95 @@ tree_delete(int data)
 				parent->left = NULL;
 			else
 				parent->right = NULL;
-			free(node);
-			return 0;
+		} else {
+			del_rebalance(node);
+		}
+	}
+	free(node);
+	return 0;
+}
+
+void 
+del_rebalance(Tree *node)
+{
+	parent = node->parent;
+	brother = (parent->left == node ? parent->right : parent->left);
+
+	//如果兄弟为红色，则进行变色和旋转，变化后依旧无法直接删除，
+	//但是经过操作后，兄弟节点将转化为黑色。
+	if (brother->color == 1) {
+		int temp_color = 0;
+		temp_color = parent->color;
+		parent->color = brother->color;
+		brother->color = temp_color;
+
+		//如果删除节点是左孩子
+		if (parent == root)
+			root = brother;
+		if (parent->left == node) {
+			rotate34(parent, brother, brother->right, 
+				node, brother->left, brother->right->left, brother->right->right);
+		//否则
+		} else {
+			rotate34(brother->left, brother, parent, 
+				brother->left->left, brother->left->right, brother->right, node);
+		}
+		//兄弟节点变了，重新计算
+		brother = (parent->left == node ? parent->right : parent->left);
+	}
+
+	//到此处，兄弟节点将一定是黑色。
+	//而且兄弟节点要么只有一个红色，要么有两个红色，要么没有儿子
+	int temp_color = 0;
+	if (parent->left == node && brother->left != brother->right) {
+		if (brother->left != NULL) { //RL
+			if (parent == root)
+				root = brother->left;
+			brother->left->color = parent->color;
+			parent->color = 0;
+			rotate34(parent, brother->left, brother, 
+				node, brother->left, brother->right, brother->right);
+		} else { //RR
+			temp_color = parent->color;
+			parent->color = brother->color;
+			brother->color = temp_color;
+			brother->right->color = 0;
+			if (parent == root)
+				root = brother;
+			rotate34(parent, brother, brother->right, 
+				node, brother->left, brother->right->left, brother->right->right);
+		}
+	} else if (parent->right == node && brother->left != brother->right) {
+		if (brother->left != null) { //LL
+			if (parent == root)
+				root = brother;
+			temp_color = parent->color;
+			parent->color = brother->color;
+			brother->color = temp_color;
+			brother->left->color = 0;
+			rotate34(brother->left, brother, parent, 
+				brother->left, brother->right, brother->right, node);
+		else { //LR
+			if (parent == root)
+				root = brother->right;
+			brother->right->color = parent->color;
+			parent->color = 0;
+			rotate34(brother, brother->right, parent, 
+				brother->left, brother->right->left, brother->right->right, node);
+		}
+	} else if (parent->right == node && brother->left == brother->right) {
+		if (parent->color == 0) {
+
 		} else {
 
 
 
 		}
+
+	} else if (parent->left == node && brother->right == brother->left){
+
+
 	}
-	return 0;
 }
 
 int
