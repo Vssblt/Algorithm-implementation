@@ -20,7 +20,6 @@ AesEx::~AesEx()
 void 
 AesEx::generate_s_box()
 {
-	//避免s_box数据直接在PE文件中明文存储，使用QMap离散数据类型存储。减小反编译者查看s-box进而推测出加密方式的概率
 	this->_s_box.insert(std::pair<int, u_char>(0, 0x63));
 	this->_s_box.insert(std::pair<int, u_char>(1, 0x7c));
 	this->_s_box.insert(std::pair<int, u_char>(2, 0x77));
@@ -549,7 +548,6 @@ AesEx::generate_s_box()
 }
 
 
-//debugged
 void
 AesEx::filling()
 {
@@ -587,7 +585,6 @@ RETURN:
 }
 
 
-//debugged
 void
 AesEx::sub_bytes()
 {
@@ -727,7 +724,6 @@ AesEx::encrypt(std::string __OUT__ &out)
 }
 
 
-//debugged
 std::string
 AesEx::gadd(int a, int b)
 {
@@ -747,7 +743,6 @@ AesEx::gadd(int a, int b)
 }
 
 
-//debugged
 std::string
 AesEx::gadd(int a, std::string b)
 {
@@ -766,7 +761,6 @@ AesEx::gadd(int a, std::string b)
 }
 
 
-//debugged
 std::string
 AesEx::gadd(std::string a, u_char b)
 {
@@ -777,7 +771,6 @@ AesEx::gadd(std::string a, u_char b)
 }
 
 
-//debugged
 std::string
 AesEx::sub_word(std::string a)
 {
@@ -793,7 +786,6 @@ AesEx::sub_word(std::string a)
 }
 
 
-//debugged
 std::string
 AesEx::sub_word(int a)
 {
@@ -811,7 +803,6 @@ AesEx::sub_word(int a)
 }
 
 
-//debugged
 std::string
 AesEx::rot_word(int a)
 {
@@ -832,7 +823,6 @@ AesEx::rot_word(int a)
 }
 
 
-//debugged
 void
 AesEx::set_key(const std::string &key)
 {
