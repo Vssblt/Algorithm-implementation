@@ -2,7 +2,6 @@
 #define BASE64_H
 
 #include <stddef.h>
-//#include "common.h"
 typedef unsigned char u_char;
 
 typedef struct Base64 Base64;

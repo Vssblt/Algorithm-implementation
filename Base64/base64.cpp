@@ -2,9 +2,6 @@
 #include <string.h>
 #include <stdio.h>
 
-/*
- * 共实现了了两种映射的base64，目前只用到了普通base64，safe-base64为预留功能。
- */
 
 static Base64 base64 = {
 	new char[64],
