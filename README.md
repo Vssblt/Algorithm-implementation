@@ -10,3 +10,7 @@ B+\_Tree(empty)
 
 B-Tree(empty)
 
+Base64(finished)
+
+AES-256(finished)
+
